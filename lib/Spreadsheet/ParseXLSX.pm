@@ -384,14 +384,15 @@ sub _parse_sheet {
                     $sheet->{MaxCol} = $col
                         if $sheet->{MaxCol} < $col;
                     my $type = $cell->att('t') || 'n';
-                    my $val_xml;
+                    my $val = undef;
                     if ($type ne 'inlineStr') {
-                        $val_xml = $cell->first_child('s:v');
+                        my $val_xml = $cell->first_child('s:v');
+                        $val = $val_xml->text if $val_xml;
                     }
                     elsif (defined $cell->first_child('s:is')) {
-                        $val_xml = ($cell->find_nodes('.//s:t'))[0];
+                        $val = join '',
+                          map { $_->text } $cell->find_nodes('.//s:t');
                     }
-                    my $val = $val_xml ? $val_xml->text : undef;
 
                     my $long_type;
                     my $Rich;
